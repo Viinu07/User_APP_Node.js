@@ -13,7 +13,8 @@ const userLoggedIn = (req, res, next) => {
       res.locals.loggedInUser = user;
       next();
     } else {
-      res.redirect('/login_user');
+      res.status(403).send({message:"Please login to continue"})
+      //res.redirect('/login_user');
     }
   })(req, res, next);
 };
@@ -23,8 +24,8 @@ route.post('/login', function (req, res, next) {
     .then((user) => {
       //console.log('user', user);
       if (!user) {
-        res.redirect('/login_user');
-        //res.status(401).json({ success: false, msg: 'could not find user' });
+        // res.redirect('/login_user');
+       return  res.status(401).json({ success: false, msg: 'could not find user' });
       }
 
       // Function defined at bottom of app.js
@@ -39,17 +40,17 @@ route.post('/login', function (req, res, next) {
         res.cookie('token', tokenObject.token.split(' ')[1]);
         //console.log('valid');
         //res.setHeader('cookie', tokenObject.token);
-        /*res.status(200).json({
+        return res.status(200).json({
           success: true,
           token: tokenObject.token,
           expiresIn: tokenObject.expires,
-        });*/
-        res.redirect('/');
+        });
+        //res.redirect('/');
       } else {
-        res.redirect('/login_user');
-        /*res
+        //res.redirect('/login_user');
+       return  res
           .status(401)
-          .json({ success: false, msg: 'you entered the wrong password' });*/
+          .json({ success: false, msg: 'you entered the wrong password' });
       }
     })
     .catch((err) => {
@@ -67,6 +68,7 @@ route.get('/update-user', userLoggedIn, services.update_user);
 
 route.post('/api/users', controller.create);
 route.get('/api/users', userLoggedIn, controller.find);
+route.get('/api/users/:id', userLoggedIn, controller.find);
 route.put('/api/users/:id', userLoggedIn, controller.update);
 route.delete('/api/users/:id', userLoggedIn, controller.delete);
 
@@ -77,7 +79,8 @@ route.get('/login_user', (req, res) => {
 route.get('/logout', (req, res) => {
   req.logOut;
   res.clearCookie('token');
-  res.redirect('/login_user');
+  // res.redirect('/login_user');
+  res.status(401).json({ success: true, msg: 'you have been logged out' });
 });
 
 module.exports = route;
