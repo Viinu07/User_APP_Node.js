@@ -25,8 +25,8 @@ app.use(morgan('tiny'));
 connectDB();
 
 //parse request to body-parser
-app.use(express.urlencoded({ extended: true }));
-
+//app.use(express.urlencoded({ extended: true }));
+app.use(express.json())
 /*app.use(
   session({
     secret: 'secret',
@@ -45,12 +45,16 @@ app.set('view engine', 'ejs');
 // app.set('views', path.resolve(__dirname));
 
 //loading assets
-app.use('/css', express.static(path.resolve(__dirname, 'assets/css')));
-app.use('/img', express.static(path.resolve(__dirname, 'assets/img')));
-app.use('/js', express.static(path.resolve(__dirname, 'assets/js')));
+// app.use('/css', express.static(path.resolve(__dirname, 'assets/css')));
+// app.use('/img', express.static(path.resolve(__dirname, 'assets/img')));
+// app.use('/js', express.static(path.resolve(__dirname, 'assets/js')));
 
 //Loading routers
 app.use('/', require('./server/routes/routes'));
+
+app.use("*",(req,res,next)=>{
+  res.json({message:"the route does not exist"})
+})
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
